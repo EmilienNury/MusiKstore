@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ptut_2/ui/components/custom_app_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title}) : super(key: key);
@@ -41,10 +42,10 @@ class _HomePageState extends State<HomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
+      appBar: CustomAppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: widget.title,
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
