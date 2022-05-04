@@ -14,4 +14,5 @@ class Body{
       _$BodyFromJson(json);
 
   Map<String, dynamic> toJson() => _$BodyToJson(this);
+
 }

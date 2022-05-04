@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:ptut_2/core/model/Songs/feed.dart';
+import 'package:ptut_2/core/model/Songs/songs.dart';
 import 'package:ptut_2/ui/components/custom_app_bar.dart';
-import 'package:ptut_2/core/manager/lyrics_manager.dart';
+import 'package:ptut_2/core/manager/lyrics_songs_manager.dart';
 import 'package:ptut_2/core/model/Lyrics/message.dart';
 import 'package:ptut_2/core/model/Lyrics/musicxmatch.dart';
 
@@ -24,24 +26,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Musicxmatch? testLyrics;
+  Songs? test;
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<dynamic>>(
         future: Future.wait([
-          LyricsManager().getLyrics("10074988"),
+          LyricsSongManager().getMostPopularSong(),
+
         ]
         ),
         builder: (context, snapshot){
           if(snapshot.hasData){
-            testLyrics = snapshot.data?[0];
-            print(testLyrics?.message.body.lyrics.pixel_tracking_url);
+            test = snapshot.data?[0];
+            print(test?.feed.results?.first.name);
           }
           return Column(
-            children:  [
-               Image(
-                image: NetworkImage(testLyrics?.message.body.lyrics.pixel_tracking_url ?? ""),
-              )
+            children:  const [
+               Text("test")
             ],
           );
         }
