@@ -14,6 +14,11 @@ class MainTheme {
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: CustomColors.red,
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: CustomColors.grey,
+          selectedItemColor: CustomColors.red,
+          unselectedItemColor: Colors.white
         )
     );
   }

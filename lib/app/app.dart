@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ptut_2/ui/home.dart';
+import 'package:ptut_2/ui/musikstore.dart';
 
 import '../theme/main_theme.dart';
 
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "Musi K'store",
       theme: MainTheme.darkTheme,
-      home: const HomePage(title: "Musi K'store"),
+      home: const MusiKstoreApp(title: "Musi K'store"),
     );
   }
 }
