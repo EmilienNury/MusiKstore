@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ptut_2/ui/components/custom_app_bar.dart';
 import 'package:ptut_2/core/manager/lyrics_manager.dart';
 import 'package:ptut_2/core/model/Lyrics/message.dart';
 import 'package:ptut_2/core/model/Lyrics/musicxmatch.dart';
