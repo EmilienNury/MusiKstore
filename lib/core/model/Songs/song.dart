@@ -9,10 +9,10 @@ class Song{
   String id;
   String? artistName;
   String? name;
-  String? artowrkUrl100;
+  String? artworkUrl100;
   List<Genre>? genres;
 
-  Song({required this.id, this.artistName, this.name, this.artowrkUrl100, this.genres});
+  Song({required this.id, this.artistName, this.name, this.artworkUrl100, this.genres});
 
   factory Song.fromJson(Map<String, dynamic> json) =>
       _$SongFromJson(json);

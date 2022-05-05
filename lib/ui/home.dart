@@ -1,10 +1,15 @@
+import 'dart:typed_data';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ptut_2/core/model/Songs/feed.dart';
 import 'package:ptut_2/core/model/Songs/songs.dart';
 import 'package:ptut_2/ui/components/custom_app_bar.dart';
 import 'package:ptut_2/core/manager/lyrics_songs_manager.dart';
 import 'package:ptut_2/core/model/Lyrics/message.dart';
 import 'package:ptut_2/core/model/Lyrics/musicxmatch.dart';
+import 'package:ptut_2/ui/player.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title}) : super(key: key);
@@ -27,25 +32,30 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Songs? test;
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<dynamic>>(
         future: Future.wait([
           LyricsSongManager().getMostPopularSong(),
-
         ]
         ),
         builder: (context, snapshot){
           if(snapshot.hasData){
             test = snapshot.data?[0];
-            print(test?.feed.results?.first.name);
           }
           return Column(
-            children:  const [
-               Text("test")
+            children:  [
+               Text("test"),
+              TextButton(
+                  onPressed: () async => await Navigator.of(context).pushNamed(PlayerPage.route, arguments: PlayerPageArguments(music: test!.feed.results!.first)) ,
+                  child: Text("test music")
+              )
             ],
           );
         }
     );
   }
+
+
 }
