@@ -37,6 +37,7 @@ dependencies:
   # Serialization / Deserialization
   json_annotation: ^4.5.0
   dio: ^4.0.4
+  oauth2: ^2.0.0
 
 dev_dependencies:
   flutter_test:

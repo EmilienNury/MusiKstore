@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
         builder: (context, snapshot){
           if(snapshot.hasData){
             test = snapshot.data?[0];
-            print(test?.feed.results?.first.name);
+            print(test?.feed.results?.first.artworkUrl100);
           }
           return Column(
             children:  const [
