@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ptut_2/ui/custom_widget/home_songs.dart';
 import 'package:ptut_2/ui/custom_widget/song_container.dart';
 
+import '../../core/manager/lyrics_songs_manager.dart';
 import '../custom_widget/home_playlists.dart';
 
 class HomePage extends StatelessWidget {
@@ -11,33 +12,27 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder<List<dynamic>>(
       future: Future.wait([
+        LyricsSongManager().getMostPopularSong(),
         //DataBaseManager().getAllFavSongs(),
         //DataBaseManager().getAllPlaylists(),
-        //ApiManager().getAllPopularSongs(),
-        //ApiManager().getAllRecommendedSongs(),
-
       ]),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          var favSongs = snapshot.data?[0];   // as list<Song>
-          var playlists = snapshot.data?[1];
-          var popularSongs = snapshot.data?[2];
-          var recommendedSongs = snapshot.data?[3];
+          //var favSongs = snapshot.data?[0];   // as list<Song>
+          //var playlists = snapshot.data?[1];
+          var popularSongs = snapshot.data?[0];
           return Container(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 25.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
+            child: ListView(
+                scrollDirection: Axis.vertical,
                 children: <Widget>[
-                  HomeSongs(favSongs, "Favoris"),
-                  HomePlaylists(playlists),
+                  //HomeSongs(favSongs, "Favoris"),
+                  //HomePlaylists(playlists),
                   HomeSongs(popularSongs, "Populaires"),
-                  HomeSongs(recommendedSongs, "Nos recommendations"),
+                  HomeSongs(popularSongs, "Nos recommendations"),
+                  HomePlaylists(popularSongs),
 
                 ],
               ),
-            ),
           );
         } else {
           return const Center(

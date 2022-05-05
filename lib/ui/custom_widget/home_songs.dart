@@ -3,32 +3,47 @@
 import 'package:flutter/material.dart';
 import 'package:ptut_2/ui/custom_widget/song_container.dart';
 
-Widget HomeSongs(dynamic songs, String category) { //TODO: change type songs
-  if(true) { //TODO: if !songs.isEmpty
-    return Stack(
-      children: [
-        Text(
-          category,
-          style: const TextStyle(
-            fontSize: 28.0,
+import '../../core/model/Songs/songs.dart';
+
+Widget HomeSongs(Songs songs, String category) {
+  if(songs.feed.results != null){
+    if(!songs.feed.results!.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+        child: SizedBox(
+          height: 300,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                category,
+                style: const TextStyle(
+                  fontSize: 28.0,
+                ),
+                textAlign: TextAlign.start,
+              ),
+              const SizedBox(height: 20.0,),
+              Expanded(
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  separatorBuilder: (context, position) {
+                    return const SizedBox(
+                      width: 28.0,
+                    );
+                  },
+                  itemBuilder: (context, position) {
+                    print(songs.feed.results![position]);
+                    return SongContainer(songs.feed.results![position].artworkUrl100!, songs.feed.results![position].name!, songs.feed.results![position].artistName!);
+                  },
+                  itemCount: songs.feed.results!.length,
+                ),
+              )
+            ] ,
           ),
         ),
-        const SizedBox(height: 20.0,),
-        Expanded(
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            separatorBuilder: (context, position) {
-              return const SizedBox(
-                width: 28.0,
-              );
-            },
-            itemBuilder: (context, position) {
-              return SongContainer("imageUrl", "songName", "artistName"); //TODO: change with favSongs values
-            },
-            itemCount: 1/*favSongs.length*/,
-          ),
-        )
-      ] ,
-    );
+      );
+    }
   }
+  return SizedBox();
 }
