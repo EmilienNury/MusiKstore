@@ -31,7 +31,8 @@ class _PlayerPageState extends State<PlayerPage>{
   String currentpostlabel = "00:00";
   String maxpostlabel = "00:00";
   String audioasset = "assets/audio/Doigby_Guerrier.mp3";
-  bool isplaying = true;
+  bool isplaying = false;
+  bool isRecording = false;
 
   AudioPlayer audioPlayer = AudioPlayer();
 
@@ -42,6 +43,8 @@ class _PlayerPageState extends State<PlayerPage>{
       ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
       Uint8List audiobytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
       int result = await audioPlayer.playBytes(audiobytes);
+      isplaying = true;
+
 
       audioPlayer.onDurationChanged.listen((Duration d) { //get the duration of audio
         maxduration = d.inMilliseconds;
@@ -259,8 +262,238 @@ class _PlayerPageState extends State<PlayerPage>{
                                 ),
                               ],
                             ),
-                            Tab(icon: Icon(Icons.directions_car)),
-                            Tab(icon: Icon(Icons.directions_transit)),
+                            Column(
+                              children: [
+                                const SizedBox(
+                                  height: 16,
+                                ),
+                                SizedBox(
+                                  width: MediaQuery.of(context).size.width - 50,
+                                  height: 400,
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                        border:  Border.all(
+                                          color: Colors.white,
+                                          width: 5,
+                                        ),
+                                    ),
+                                  )
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () async {
+                                        int result = await audioPlayer.seek(const Duration(milliseconds: 0));
+                                        if(result == 1){ //seek successful
+                                          currentpos = 0;}
+                                        else {
+                                          print("Seek unsuccessful.");
+                                        }
+                                      },
+                                      icon: const Icon(Icons.skip_previous),
+                                      color: Colors.white,
+                                      iconSize: 80,
+                                    ),
+                                    IconButton(
+                                      onPressed: () async{
+                                        if(isplaying){
+                                          int result = await audioPlayer.pause();
+                                          if(result == 1){
+                                            setState(() {
+                                              isplaying = false;
+                                            });
+                                          }else{
+                                            print("Error on pause audio.");
+                                          }
+                                        }else{
+                                          int result = await audioPlayer.resume();
+                                          if(result == 1){
+                                            setState(() {
+                                              isplaying = true;
+                                            });
+                                          }else{
+                                            print("Error on resume audio.");
+                                          }
+                                        }
+                                      },
+                                      icon: Icon(isplaying?Icons.pause:Icons.play_arrow),
+                                      color: Colors.white,
+                                      iconSize: 120,
+                                    ),
+                                    IconButton(
+                                      onPressed: () => "",
+                                      icon: const Icon(Icons.skip_next),
+                                      color: Colors.white,
+                                      iconSize: 80,
+                                    ),
+                                  ],
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                ),
+                                Slider(
+                                  activeColor: Colors.white,
+                                  inactiveColor: Colors.white,
+                                  value: double.parse(currentpos.toString()),
+                                  min: 0,
+                                  max: double.parse(maxduration.toString()),
+                                  divisions: maxduration,
+                                  label: currentpostlabel,
+                                  onChanged: (double value) async {
+                                    int seekval = value.round();
+                                    if(seekval != maxduration){
+                                      int result = await audioPlayer.seek(Duration(milliseconds: seekval));
+                                      if(result == 1){ //seek successful
+                                        currentpos = seekval;
+                                      }else{
+                                        print("Seek unsuccessful.");
+                                      }
+                                    }else{
+                                      int result = await audioPlayer.seek(Duration(milliseconds: 0));
+                                      if(result == 1){ //seek successful
+                                        currentpos = 0;
+                                      }else{
+                                        print("Seek unsuccessful.");
+                                      }
+                                    }
+                                  },
+                                ),
+                                Row(
+                                  children: [
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      currentpostlabel,
+                                      style: const TextStyle(fontSize: 25),
+                                      textAlign: TextAlign.right,
+                                    ),
+                                    const SizedBox(
+                                      width: 300,
+                                    ),
+                                    Text(
+                                      maxpostlabel,
+                                      style: const TextStyle(fontSize: 25),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                const SizedBox(
+                                  height: 16,
+                                ),
+                                SizedBox(
+                                    width: MediaQuery.of(context).size.width - 50,
+                                    height: 400,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        border:  Border.all(
+                                          color: Colors.white,
+                                          width: 5,
+                                        ),
+                                      ),
+                                    )
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () async {
+                                        int result = await audioPlayer.seek(const Duration(milliseconds: 0));
+                                        if(result == 1){ //seek successful
+                                          currentpos = 0;}
+                                        else {
+                                          print("Seek unsuccessful.");
+                                        }
+                                      },
+                                      icon: const Icon(Icons.skip_previous),
+                                      color: Colors.white,
+                                      iconSize: 80,
+                                    ),
+                                    IconButton(
+                                      onPressed: () async{
+                                        if(isRecording){
+                                          int result = await audioPlayer.pause();
+                                          if(result == 1){
+                                            setState(() {
+                                              isRecording = false;
+                                            });
+                                          }else{
+                                            print("Error on pause audio.");
+                                          }
+                                        }else{
+                                          int result = await audioPlayer.resume();
+                                          if(result == 1){
+                                            setState(() {
+                                              isRecording = true;
+                                            });
+                                          }else{
+                                            print("Error on resume audio.");
+                                          }
+                                        }
+                                      },
+                                      icon: Icon(isRecording?Icons.fiber_manual_record_rounded:Icons.fiber_manual_record_outlined),
+                                      color: Colors.red,
+                                      iconSize: 120,
+                                    ),
+                                    IconButton(
+                                      onPressed: () => "",
+                                      icon: const Icon(Icons.skip_next),
+                                      color: Colors.white,
+                                      iconSize: 80,
+                                    ),
+                                  ],
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                ),
+                                Slider(
+                                  activeColor: Colors.white,
+                                  inactiveColor: Colors.white,
+                                  value: double.parse(currentpos.toString()),
+                                  min: 0,
+                                  max: double.parse(maxduration.toString()),
+                                  divisions: maxduration,
+                                  label: currentpostlabel,
+                                  onChanged: (double value) async {
+                                    int seekval = value.round();
+                                    if(seekval != maxduration){
+                                      int result = await audioPlayer.seek(Duration(milliseconds: seekval));
+                                      if(result == 1){ //seek successful
+                                        currentpos = seekval;
+                                      }else{
+                                        print("Seek unsuccessful.");
+                                      }
+                                    }else{
+                                      int result = await audioPlayer.seek(Duration(milliseconds: 0));
+                                      if(result == 1){ //seek successful
+                                        currentpos = 0;
+                                      }else{
+                                        print("Seek unsuccessful.");
+                                      }
+                                    }
+                                  },
+                                ),
+                                Row(
+                                  children: [
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      currentpostlabel,
+                                      style: const TextStyle(fontSize: 25),
+                                      textAlign: TextAlign.right,
+                                    ),
+                                    const SizedBox(
+                                      width: 300,
+                                    ),
+                                    Text(
+                                      maxpostlabel,
+                                      style: const TextStyle(fontSize: 25),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
