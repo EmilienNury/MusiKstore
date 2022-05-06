@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ptut_2/core/model/Songs/song.dart';
+import 'package:ptut_2/core/navigation_service.dart';
 import 'package:ptut_2/ui/musikstore.dart';
 import 'package:ptut_2/ui/player.dart';
 
@@ -14,6 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "Musi K'store",
       theme: MainTheme.darkTheme,
+        navigatorKey: NavigationService.navigatorKey,
         home: const MusiKstoreApp(title: "Musi K'store"),
       onGenerateRoute: (RouteSettings settings){
         var arguments = settings.arguments;

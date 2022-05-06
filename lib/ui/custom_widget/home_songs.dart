@@ -34,7 +34,7 @@ Widget HomeSongs(Songs songs, String category) {
                   },
                   itemBuilder: (context, position) {
                     print(songs.feed.results![position]);
-                    return SongContainer(songs.feed.results![position].artworkUrl100!, songs.feed.results![position].name!, songs.feed.results![position].artistName!);
+                    return SongContainer(songs.feed.results![position]);
                   },
                   itemCount: songs.feed.results!.length,
                 ),

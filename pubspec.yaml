@@ -67,6 +67,7 @@ flutter:
   assets:
     - assets/images/logo_150x150.png
     - assets/audio/Timal_Gazo_Filtré_Clip_Officiel.mp3
+    - assets/audio/Doigby_Guerrier.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

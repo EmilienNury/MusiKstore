@@ -1,11 +1,16 @@
 // Custom widget for song cards
-
 import 'package:flutter/material.dart';
+import 'package:ptut_2/core/model/Songs/song.dart';
+import 'package:ptut_2/core/navigation_service.dart';
 
-Widget SongContainer(String imageUrl, String songName, String artistName) {
+import '../player.dart';
+
+Widget SongContainer(Song song) {
   return Container(
     child: InkWell(
-      onTap: () {},
+      onTap: () async{
+        await Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamed(PlayerPage.route, arguments: PlayerPageArguments(music: song));
+      },
       child: Container(
         width: 140,
         child: Column(
@@ -16,12 +21,12 @@ Widget SongContainer(String imageUrl, String songName, String artistName) {
               child: Container(
                 height: 140.0,
                 width: 140.0,
-                child: Image.network(imageUrl, fit: BoxFit.fill,),
+                child: Image.network(song.artworkUrl100 ?? "", fit: BoxFit.fill,),
               ),
             ),
             const SizedBox(height: 12.0,),
             Text(
-              songName,
+              song.name ?? "",
               style: const TextStyle(
                   fontWeight: FontWeight.w800,
                   fontSize: 22.0
@@ -30,7 +35,7 @@ Widget SongContainer(String imageUrl, String songName, String artistName) {
             ),
             const SizedBox(height: 12.0,),
             Text(
-              artistName,
+              song.artistName ?? "",
               style: const TextStyle(
                   fontWeight: FontWeight.w300,
                   fontSize: 18.0
