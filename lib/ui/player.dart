@@ -4,9 +4,12 @@ import 'dart:typed_data';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ptut_2/core/manager/lyrics_songs_manager.dart';
 import 'package:ptut_2/core/model/Songs/song.dart';
+import 'package:ptut_2/core/model/Videos/list_search.dart';
 import 'package:ptut_2/theme/colors.dart';
 import 'package:sound_stream/sound_stream.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 
 class PlayerPageArguments{
@@ -29,6 +32,7 @@ class PlayerPage extends StatefulWidget{
 
 class _PlayerPageState extends State<PlayerPage>{
   late Song music;
+  late ListSearch search;
   int maxduration = 100;
   int currentpos =0;
   String currentpostlabel = "00:00";
@@ -36,6 +40,8 @@ class _PlayerPageState extends State<PlayerPage>{
   String audioasset = "assets/audio/Timal.mp3";
   bool isplaying = false;
   bool isRecording = false;
+
+  late YoutubePlayerController _controller;
 
   RecorderStream _recorder = RecorderStream();
 
@@ -131,389 +137,401 @@ class _PlayerPageState extends State<PlayerPage>{
           return false;
         }
       },
-      child: DefaultTabController(
-          length: 3,
-          child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: CustomColors.black,
-              title: Text(
-                "${music.name} - ${music.artistName}",
-                style: const TextStyle(fontSize: 25),
-              ),
-            ),
-            body: SingleChildScrollView(
-                child: Center(
-                  child: Column(
-                    children: [
-                       TabBar(
-                        indicatorColor: const Color.fromRGBO(212, 72, 79, 100),
-                        labelColor: const Color.fromRGBO(212, 72, 79, 100) ,
-                        unselectedLabelColor: Colors.white,
-                        physics: const NeverScrollableScrollPhysics(),
-                        tabs: const [
-                          Tab(icon: Text(
-                            "Lecture",
-                            style: TextStyle(fontSize: 12),
+      child: FutureBuilder<List<dynamic>>(
+        future: Future.wait([
+          LyricsSongManager().getSearch("${music.artistName} ${music.name}"),
+        ]),
+        builder: (context, snapshot){
+          if(snapshot.hasData){
+            search = snapshot.data?[0];
+            _controller = YoutubePlayerController(
+                initialVideoId: search.items?.first.id.videoId ?? "",
+                flags: const YoutubePlayerFlags(
+                  autoPlay: true,
+                  mute: false,
+                ),
+            );
+          }
+          return DefaultTabController(
+              length: 3,
+              child: Scaffold(
+                appBar: AppBar(
+                  backgroundColor: CustomColors.black,
+                  title: Text(
+                    "${music.name} - ${music.artistName}",
+                    style: const TextStyle(fontSize: 25),
+                  ),
+                ),
+                body: SingleChildScrollView(
+                    child: Center(
+                      child: Column(
+                        children: [
+                          TabBar(
+                            indicatorColor: const Color.fromRGBO(212, 72, 79, 100),
+                            labelColor: const Color.fromRGBO(212, 72, 79, 100) ,
+                            unselectedLabelColor: Colors.white,
+                            physics: const NeverScrollableScrollPhysics(),
+                            tabs: const [
+                              Tab(icon: Text(
+                                "Lecture",
+                                style: TextStyle(fontSize: 12),
+                              ),
+                              ),
+                              Tab(icon: Text(
+                                "Karaoke",
+                                style: TextStyle(fontSize: 12),
+                              ),
+                              ),
+                              Tab(icon: Text(
+                                "Enregistrement",
+                                style: TextStyle(fontSize: 12),
+                              ),
+                              ),
+                            ],
+                            onTap: (int index) async {
+                              int result = await audioPlayer.stop();
+                              if(result == 1){
+                                setState(() {
+                                  isplaying = false;
+                                });
+                              }
+                            },
                           ),
-                          ),
-                          Tab(icon: Text(
-                            "Karaoke",
-                            style: TextStyle(fontSize: 12),
-                          ),
-                          ),
-                          Tab(icon: Text(
-                            "Enregistrement",
-                            style: TextStyle(fontSize: 12),
-                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height - 150,
+                            child: TabBarView(
+                              physics: const NeverScrollableScrollPhysics(),
+                              children: [
+                                //Lecture
+                                Column(
+                                  children: [
+                                    const SizedBox(
+                                      height: 16,
+                                    ),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width - 50,
+                                      height: 400,
+                                      child: Image.network(
+                                        music.artworkUrl100 ?? "",
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          onPressed: () async {
+                                            int result = await audioPlayer.seek(const Duration(milliseconds: 0));
+                                            if(result == 1){ //seek successful
+                                              currentpos = 0;}
+                                            else {
+                                              print("Seek unsuccessful.");
+                                            }
+                                          },
+                                          icon: const Icon(Icons.skip_previous),
+                                          color: Colors.white,
+                                          iconSize: 80,
+                                        ),
+                                        IconButton(
+                                          onPressed: () async{
+                                            if(isplaying){
+                                              int result = await audioPlayer.pause();
+                                              if(result == 1){
+                                                setState(() {
+                                                  isplaying = false;
+                                                });
+                                              }else{
+                                                print("Error on pause audio.");
+                                              }
+                                            }else{
+                                              int result = await audioPlayer.resume();
+                                              if(result == 1){
+                                                setState(() {
+                                                  isplaying = true;
+                                                });
+                                              }else{
+                                                print("Error on resume audio.");
+                                              }
+                                            }
+                                          },
+                                          icon: Icon(isplaying?Icons.pause:Icons.play_arrow),
+                                          color: Colors.white,
+                                          iconSize: 120,
+                                        ),
+                                        IconButton(
+                                          onPressed: () => "",
+                                          icon: const Icon(Icons.skip_next),
+                                          color: Colors.white,
+                                          iconSize: 80,
+                                        ),
+                                      ],
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                    ),
+                                    Slider(
+                                      activeColor: Colors.white,
+                                      inactiveColor: Colors.white,
+                                      value: double.parse(currentpos.toString()),
+                                      min: 0,
+                                      max: double.parse(maxduration.toString()),
+                                      divisions: maxduration,
+                                      label: currentpostlabel,
+                                      onChanged: (double value) async {
+                                        int seekval = value.round();
+                                        if(seekval != maxduration){
+                                          int result = await audioPlayer.seek(Duration(milliseconds: seekval));
+                                          if(result == 1){ //seek successful
+                                            currentpos = seekval;
+                                          }else{
+                                            print("Seek unsuccessful.");
+                                          }
+                                        }else{
+                                          int result = await audioPlayer.seek(Duration(milliseconds: 0));
+                                          if(result == 1){ //seek successful
+                                            currentpos = 0;
+                                          }else{
+                                            print("Seek unsuccessful.");
+                                          }
+                                        }
+                                      },
+                                    ),
+                                    Row(
+                                      children: [
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          currentpostlabel,
+                                          style: const TextStyle(fontSize: 25),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                        const SizedBox(
+                                          width: 300,
+                                        ),
+                                        Text(
+                                          maxpostlabel,
+                                          style: const TextStyle(fontSize: 25),
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                //Karaoke
+                                Column(
+                                  children: [
+                                    const SizedBox(
+                                      height: 16,
+                                    ),
+                                    YoutubePlayer(
+                                        controller: _controller,
+                                        showVideoProgressIndicator: false,
+                                    ),
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          onPressed: () async {
+                                            int result = await audioPlayer.seek(const Duration(milliseconds: 0));
+                                            if(result == 1){ //seek successful
+                                              currentpos = 0;}
+                                            else {
+                                              print("Seek unsuccessful.");
+                                            }
+                                          },
+                                          icon: const Icon(Icons.skip_previous),
+                                          color: Colors.white,
+                                          iconSize: 80,
+                                        ),
+                                        IconButton(
+                                          onPressed: () async{
+                                            if(isplaying){
+                                              int result = await audioPlayer.pause();
+                                              if(result == 1){
+                                                setState(() {
+                                                  isplaying = false;
+                                                });
+                                              }else{
+                                                print("Error on pause audio.");
+                                              }
+                                            }else{
+                                              int result = await audioPlayer.resume();
+                                              if(result == 1){
+                                                setState(() {
+                                                  isplaying = true;
+                                                });
+                                              }else{
+                                                print("Error on resume audio.");
+                                              }
+                                            }
+                                          },
+                                          icon: Icon(isplaying?Icons.pause:Icons.play_arrow),
+                                          color: Colors.white,
+                                          iconSize: 120,
+                                        ),
+                                        IconButton(
+                                          onPressed: () => "",
+                                          icon: const Icon(Icons.skip_next),
+                                          color: Colors.white,
+                                          iconSize: 80,
+                                        ),
+                                      ],
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                    ),
+                                    Slider(
+                                      activeColor: Colors.white,
+                                      inactiveColor: Colors.white,
+                                      value: double.parse(currentpos.toString()),
+                                      min: 0,
+                                      max: double.parse(maxduration.toString()),
+                                      divisions: maxduration,
+                                      label: currentpostlabel,
+                                      onChanged: (double value) async {
+                                        int seekval = value.round();
+                                        if(seekval != maxduration){
+                                          int result = await audioPlayer.seek(Duration(milliseconds: seekval));
+                                          if(result == 1){ //seek successful
+                                            currentpos = seekval;
+                                          }else{
+                                            print("Seek unsuccessful.");
+                                          }
+                                        }else{
+                                          int result = await audioPlayer.seek(Duration(milliseconds: 0));
+                                          if(result == 1){ //seek successful
+                                            currentpos = 0;
+                                          }else{
+                                            print("Seek unsuccessful.");
+                                          }
+                                        }
+                                      },
+                                    ),
+                                    Row(
+                                      children: [
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          currentpostlabel,
+                                          style: const TextStyle(fontSize: 25),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                        const SizedBox(
+                                          width: 300,
+                                        ),
+                                        Text(
+                                          maxpostlabel,
+                                          style: const TextStyle(fontSize: 25),
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                //Enregistrement
+                                Column(
+                                  children: [
+                                    const SizedBox(
+                                      height: 16,
+                                    ),
+                                    SizedBox(
+                                        width: MediaQuery.of(context).size.width - 50,
+                                        height: 400,
+                                        child: DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            border:  Border.all(
+                                              color: Colors.white,
+                                              width: 5,
+                                            ),
+                                          ),
+                                        )
+                                    ),
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          onPressed: () async {
+                                            int result = await audioPlayer.seek(const Duration(milliseconds: 0));
+                                            if(result == 1){ //seek successful
+                                              currentpos = 0;}
+                                            else {
+                                              print("Seek unsuccessful.");
+                                            }
+                                          },
+                                          icon: const Icon(Icons.skip_previous),
+                                          color: Colors.white,
+                                          iconSize: 80,
+                                        ),
+                                        IconButton(
+                                          icon: Icon(_isRecording?Icons.fiber_manual_record_rounded:Icons.fiber_manual_record_outlined),
+                                          color: Colors.red,
+                                          iconSize: 120,
+                                          onPressed: _isRecording ? _recorder.stop : _recorder.start,
+                                        ),
+                                        IconButton(
+                                          onPressed: () => "",
+                                          icon: const Icon(Icons.skip_next),
+                                          color: Colors.white,
+                                          iconSize: 80,
+                                        ),
+                                      ],
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                    ),
+                                    Slider(
+                                      activeColor: Colors.white,
+                                      inactiveColor: Colors.white,
+                                      value: double.parse(currentpos.toString()),
+                                      min: 0,
+                                      max: double.parse(maxduration.toString()),
+                                      divisions: maxduration,
+                                      label: currentpostlabel,
+                                      onChanged: (double value) async {
+                                        int seekval = value.round();
+                                        if(seekval != maxduration){
+                                          int result = await audioPlayer.seek(Duration(milliseconds: seekval));
+                                          if(result == 1){ //seek successful
+                                            currentpos = seekval;
+                                          }else{
+                                            print("Seek unsuccessful.");
+                                          }
+                                        }else{
+                                          int result = await audioPlayer.seek(Duration(milliseconds: 0));
+                                          if(result == 1){ //seek successful
+                                            currentpos = 0;
+                                          }else{
+                                            print("Seek unsuccessful.");
+                                          }
+                                        }
+                                      },
+                                    ),
+                                    Row(
+                                      children: [
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          currentpostlabel,
+                                          style: const TextStyle(fontSize: 25),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                        const SizedBox(
+                                          width: 300,
+                                        ),
+                                        Text(
+                                          maxpostlabel,
+                                          style: const TextStyle(fontSize: 25),
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ],
-                        onTap: (int index) async {
-                          int result = await audioPlayer.stop();
-                          if(result == 1){
-                            setState(() {
-                              isplaying = false;
-                            });
-                          }
-                        },
                       ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height - 150,
-                        child: TabBarView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          children: [
-                            Column(
-                              children: [
-                                const SizedBox(
-                                  height: 16,
-                                ),
-                                SizedBox(
-                                  width: MediaQuery.of(context).size.width - 50,
-                                  height: 400,
-                                  child: Image.network(
-                                    music.artworkUrl100 ?? "",
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () async {
-                                        int result = await audioPlayer.seek(const Duration(milliseconds: 0));
-                                        if(result == 1){ //seek successful
-                                          currentpos = 0;}
-                                        else {
-                                          print("Seek unsuccessful.");
-                                        }
-                                      },
-                                      icon: const Icon(Icons.skip_previous),
-                                      color: Colors.white,
-                                      iconSize: 80,
-                                    ),
-                                    IconButton(
-                                      onPressed: () async{
-                                        if(isplaying){
-                                          int result = await audioPlayer.pause();
-                                          if(result == 1){
-                                            setState(() {
-                                              isplaying = false;
-                                            });
-                                          }else{
-                                            print("Error on pause audio.");
-                                          }
-                                        }else{
-                                          int result = await audioPlayer.resume();
-                                          if(result == 1){
-                                            setState(() {
-                                              isplaying = true;
-                                            });
-                                          }else{
-                                            print("Error on resume audio.");
-                                          }
-                                        }
-                                      },
-                                      icon: Icon(isplaying?Icons.pause:Icons.play_arrow),
-                                      color: Colors.white,
-                                      iconSize: 120,
-                                    ),
-                                    IconButton(
-                                      onPressed: () => "",
-                                      icon: const Icon(Icons.skip_next),
-                                      color: Colors.white,
-                                      iconSize: 80,
-                                    ),
-                                  ],
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                ),
-                                Slider(
-                                  activeColor: Colors.white,
-                                  inactiveColor: Colors.white,
-                                  value: double.parse(currentpos.toString()),
-                                  min: 0,
-                                  max: double.parse(maxduration.toString()),
-                                  divisions: maxduration,
-                                  label: currentpostlabel,
-                                  onChanged: (double value) async {
-                                    int seekval = value.round();
-                                    if(seekval != maxduration){
-                                      int result = await audioPlayer.seek(Duration(milliseconds: seekval));
-                                      if(result == 1){ //seek successful
-                                        currentpos = seekval;
-                                      }else{
-                                        print("Seek unsuccessful.");
-                                      }
-                                    }else{
-                                      int result = await audioPlayer.seek(Duration(milliseconds: 0));
-                                      if(result == 1){ //seek successful
-                                        currentpos = 0;
-                                      }else{
-                                        print("Seek unsuccessful.");
-                                      }
-                                    }
-                                  },
-                                ),
-                                Row(
-                                  children: [
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      currentpostlabel,
-                                      style: const TextStyle(fontSize: 25),
-                                      textAlign: TextAlign.right,
-                                    ),
-                                    const SizedBox(
-                                      width: 300,
-                                    ),
-                                    Text(
-                                      maxpostlabel,
-                                      style: const TextStyle(fontSize: 25),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                const SizedBox(
-                                  height: 16,
-                                ),
-                                SizedBox(
-                                  width: MediaQuery.of(context).size.width - 50,
-                                  height: 400,
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                        border:  Border.all(
-                                          color: Colors.white,
-                                          width: 5,
-                                        ),
-                                    ),
-                                  )
-                                ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () async {
-                                        int result = await audioPlayer.seek(const Duration(milliseconds: 0));
-                                        if(result == 1){ //seek successful
-                                          currentpos = 0;}
-                                        else {
-                                          print("Seek unsuccessful.");
-                                        }
-                                      },
-                                      icon: const Icon(Icons.skip_previous),
-                                      color: Colors.white,
-                                      iconSize: 80,
-                                    ),
-                                    IconButton(
-                                      onPressed: () async{
-                                        if(isplaying){
-                                          int result = await audioPlayer.pause();
-                                          if(result == 1){
-                                            setState(() {
-                                              isplaying = false;
-                                            });
-                                          }else{
-                                            print("Error on pause audio.");
-                                          }
-                                        }else{
-                                          int result = await audioPlayer.resume();
-                                          if(result == 1){
-                                            setState(() {
-                                              isplaying = true;
-                                            });
-                                          }else{
-                                            print("Error on resume audio.");
-                                          }
-                                        }
-                                      },
-                                      icon: Icon(isplaying?Icons.pause:Icons.play_arrow),
-                                      color: Colors.white,
-                                      iconSize: 120,
-                                    ),
-                                    IconButton(
-                                      onPressed: () => "",
-                                      icon: const Icon(Icons.skip_next),
-                                      color: Colors.white,
-                                      iconSize: 80,
-                                    ),
-                                  ],
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                ),
-                                Slider(
-                                  activeColor: Colors.white,
-                                  inactiveColor: Colors.white,
-                                  value: double.parse(currentpos.toString()),
-                                  min: 0,
-                                  max: double.parse(maxduration.toString()),
-                                  divisions: maxduration,
-                                  label: currentpostlabel,
-                                  onChanged: (double value) async {
-                                    int seekval = value.round();
-                                    if(seekval != maxduration){
-                                      int result = await audioPlayer.seek(Duration(milliseconds: seekval));
-                                      if(result == 1){ //seek successful
-                                        currentpos = seekval;
-                                      }else{
-                                        print("Seek unsuccessful.");
-                                      }
-                                    }else{
-                                      int result = await audioPlayer.seek(Duration(milliseconds: 0));
-                                      if(result == 1){ //seek successful
-                                        currentpos = 0;
-                                      }else{
-                                        print("Seek unsuccessful.");
-                                      }
-                                    }
-                                  },
-                                ),
-                                Row(
-                                  children: [
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      currentpostlabel,
-                                      style: const TextStyle(fontSize: 25),
-                                      textAlign: TextAlign.right,
-                                    ),
-                                    const SizedBox(
-                                      width: 300,
-                                    ),
-                                    Text(
-                                      maxpostlabel,
-                                      style: const TextStyle(fontSize: 25),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                const SizedBox(
-                                  height: 16,
-                                ),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width - 50,
-                                    height: 400,
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        border:  Border.all(
-                                          color: Colors.white,
-                                          width: 5,
-                                        ),
-                                      ),
-                                    )
-                                ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () async {
-                                        int result = await audioPlayer.seek(const Duration(milliseconds: 0));
-                                        if(result == 1){ //seek successful
-                                          currentpos = 0;}
-                                        else {
-                                          print("Seek unsuccessful.");
-                                        }
-                                      },
-                                      icon: const Icon(Icons.skip_previous),
-                                      color: Colors.white,
-                                      iconSize: 80,
-                                    ),
-                                    IconButton(
-                                      icon: Icon(_isRecording?Icons.fiber_manual_record_rounded:Icons.fiber_manual_record_outlined),
-                                      color: Colors.red,
-                                      iconSize: 120,
-                                      onPressed: _isRecording ? _recorder.stop : _recorder.start,
-                                    ),
-                                    IconButton(
-                                      onPressed: () => "",
-                                      icon: const Icon(Icons.skip_next),
-                                      color: Colors.white,
-                                      iconSize: 80,
-                                    ),
-                                  ],
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                ),
-                                Slider(
-                                  activeColor: Colors.white,
-                                  inactiveColor: Colors.white,
-                                  value: double.parse(currentpos.toString()),
-                                  min: 0,
-                                  max: double.parse(maxduration.toString()),
-                                  divisions: maxduration,
-                                  label: currentpostlabel,
-                                  onChanged: (double value) async {
-                                    int seekval = value.round();
-                                    if(seekval != maxduration){
-                                      int result = await audioPlayer.seek(Duration(milliseconds: seekval));
-                                      if(result == 1){ //seek successful
-                                        currentpos = seekval;
-                                      }else{
-                                        print("Seek unsuccessful.");
-                                      }
-                                    }else{
-                                      int result = await audioPlayer.seek(Duration(milliseconds: 0));
-                                      if(result == 1){ //seek successful
-                                        currentpos = 0;
-                                      }else{
-                                        print("Seek unsuccessful.");
-                                      }
-                                    }
-                                  },
-                                ),
-                                Row(
-                                  children: [
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      currentpostlabel,
-                                      style: const TextStyle(fontSize: 25),
-                                      textAlign: TextAlign.right,
-                                    ),
-                                    const SizedBox(
-                                      width: 300,
-                                    ),
-                                    Text(
-                                      maxpostlabel,
-                                      style: const TextStyle(fontSize: 25),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-            ),
-          )
-      ),
+                    )
+                ),
+              )
+          );
+        }
+      )
     );
   }
 }

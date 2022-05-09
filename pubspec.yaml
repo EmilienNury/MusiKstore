@@ -40,6 +40,7 @@ dependencies:
   audioplayers: ^0.20.1
   fluttericon: ^2.0.0
   sound_stream: ^0.3.0
+  youtube_player_flutter: ^8.0.0
 
 dev_dependencies:
   flutter_test:
