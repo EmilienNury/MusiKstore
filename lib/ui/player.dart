@@ -144,14 +144,14 @@ class _PlayerPageState extends State<PlayerPage>{
         builder: (context, snapshot){
           if(snapshot.hasData){
             search = snapshot.data?[0];
-            _controller = YoutubePlayerController(
-                initialVideoId: search.items?.first.id.videoId ?? "",
-                flags: const YoutubePlayerFlags(
-                  autoPlay: true,
-                  mute: false,
-                ),
-            );
           }
+          _controller = YoutubePlayerController(
+            initialVideoId: search.items?.first.id.videoId ?? "",
+            flags: const YoutubePlayerFlags(
+              autoPlay: true,
+              mute: false,
+            ),
+          );
           return DefaultTabController(
               length: 3,
               child: Scaffold(
@@ -324,6 +324,7 @@ class _PlayerPageState extends State<PlayerPage>{
                                     YoutubePlayer(
                                         controller: _controller,
                                         showVideoProgressIndicator: false,
+
                                     ),
                                     Row(
                                       children: [
