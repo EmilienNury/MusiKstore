@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:ptut_2/core/model/Lyrics/musicxmatch.dart';
 import 'package:ptut_2/core/model/Songs/feed.dart';
 import 'package:ptut_2/core/model/Songs/songs.dart';
+import 'package:ptut_2/core/model/Videos/list_search.dart';
 
 class ApiManager{
   static final ApiManager _instance = ApiManager._internal();
@@ -11,6 +12,7 @@ class ApiManager{
 
   late Dio dioLyrics;
   late Dio dioSongs;
+  late Dio dioVideos;
 
   ApiManager._internal() {
     dioLyrics = Dio();
@@ -18,6 +20,16 @@ class ApiManager{
 
     dioSongs = Dio();
     dioSongs.options.baseUrl = "https://rss.applemarketingtools.com/api/v2/fr/music/";
+
+    dioVideos = Dio();
+    dioVideos.options.baseUrl = "https://youtube.googleapis.com/youtube/v3/";
+  }
+
+  ListSearch? parseSearch(dynamic json){
+    if(json == null){
+      return null;
+    }
+    return ListSearch.fromJson(json);
   }
 
   Musicxmatch? parseMessage(dynamic json){
@@ -37,8 +49,17 @@ class ApiManager{
     if(json == null){
       return null;
     }
-    print(json);
     return Songs.fromJson(json);
+  }
+
+  Future<ListSearch?> getSearch(String search) async{
+    try{
+      return await dioVideos.get("search/",
+        queryParameters: {"q" : search, "key": "AIzaSyAyD8Mw6DF7i-zWnYNG7-Dxwt1_Yay5bXA"}
+      ).then((response) => parseSearch(response.data));
+    }catch(e){
+      print("Error for videos: $e");
+    }
   }
 
   Future<Musicxmatch?> getOneLyrics(String track) async {

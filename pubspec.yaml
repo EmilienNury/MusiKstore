@@ -39,6 +39,7 @@ dependencies:
   dio: ^4.0.4
   audioplayers: ^0.20.1
   fluttericon: ^2.0.0
+  sound_stream: ^0.3.0
 
 dev_dependencies:
   flutter_test:
@@ -67,7 +68,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/logo_150x150.png
-    - assets/audio/Timal_Gazo_Filtré_Clip_Officiel.mp3
+    - assets/audio/Timal.mp3
     - assets/audio/Doigby_Guerrier.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see

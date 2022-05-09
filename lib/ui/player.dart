@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -5,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ptut_2/core/model/Songs/song.dart';
 import 'package:ptut_2/theme/colors.dart';
+import 'package:sound_stream/sound_stream.dart';
+
 
 class PlayerPageArguments{
   Song music;
@@ -20,7 +23,7 @@ class PlayerPage extends StatefulWidget{
   final Song music;
 
   @override
-  State<StatefulWidget> createState() => _PlayerPageState();
+  _PlayerPageState createState() => _PlayerPageState();
 
 }
 
@@ -30,11 +33,26 @@ class _PlayerPageState extends State<PlayerPage>{
   int currentpos =0;
   String currentpostlabel = "00:00";
   String maxpostlabel = "00:00";
-  String audioasset = "assets/audio/Doigby_Guerrier.mp3";
+  String audioasset = "assets/audio/Timal.mp3";
   bool isplaying = false;
   bool isRecording = false;
 
+  RecorderStream _recorder = RecorderStream();
+
+  List<Uint8List> _micChunks = [];
+  bool _isRecording = false;
+
+  late StreamSubscription _recorderStatus;
+  late StreamSubscription _audioStream;
+
   AudioPlayer audioPlayer = AudioPlayer();
+
+  @override
+  void dispose() {
+    _recorderStatus.cancel();
+    _audioStream.cancel();
+    super.dispose();
+  }
 
   @override
   void initState(){
@@ -44,7 +62,6 @@ class _PlayerPageState extends State<PlayerPage>{
       Uint8List audiobytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
       int result = await audioPlayer.playBytes(audiobytes);
       isplaying = true;
-
 
       audioPlayer.onDurationChanged.listen((Duration d) { //get the duration of audio
         maxduration = d.inMilliseconds;
@@ -61,7 +78,6 @@ class _PlayerPageState extends State<PlayerPage>{
         setState(() {
           //refresh the UI
         });
-
       });
 
       audioPlayer.onAudioPositionChanged.listen((Duration  p){
@@ -82,8 +98,23 @@ class _PlayerPageState extends State<PlayerPage>{
         });
       });
     });
-
+    initPlugin();
     super.initState();
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlugin() async {
+    _recorderStatus = _recorder.status.listen((status) {
+      if (mounted) {
+        setState(() {
+          _isRecording = status == SoundStreamStatus.Playing;
+        });
+      }
+    });
+
+    _audioStream = _recorder.audioStream.listen((data) {
+      _micChunks.add(data);
+    });
   }
 
   @override
@@ -411,30 +442,10 @@ class _PlayerPageState extends State<PlayerPage>{
                                       iconSize: 80,
                                     ),
                                     IconButton(
-                                      onPressed: () async{
-                                        if(isRecording){
-                                          int result = await audioPlayer.pause();
-                                          if(result == 1){
-                                            setState(() {
-                                              isRecording = false;
-                                            });
-                                          }else{
-                                            print("Error on pause audio.");
-                                          }
-                                        }else{
-                                          int result = await audioPlayer.resume();
-                                          if(result == 1){
-                                            setState(() {
-                                              isRecording = true;
-                                            });
-                                          }else{
-                                            print("Error on resume audio.");
-                                          }
-                                        }
-                                      },
-                                      icon: Icon(isRecording?Icons.fiber_manual_record_rounded:Icons.fiber_manual_record_outlined),
+                                      icon: Icon(_isRecording?Icons.fiber_manual_record_rounded:Icons.fiber_manual_record_outlined),
                                       color: Colors.red,
                                       iconSize: 120,
+                                      onPressed: _isRecording ? _recorder.stop : _recorder.start,
                                     ),
                                     IconButton(
                                       onPressed: () => "",
