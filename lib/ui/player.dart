@@ -32,7 +32,7 @@ class PlayerPage extends StatefulWidget{
 
 class _PlayerPageState extends State<PlayerPage>{
   late Song music;
-  late ListSearch search;
+
   int maxduration = 100;
   int currentpos =0;
   String currentpostlabel = "00:00";
@@ -40,8 +40,6 @@ class _PlayerPageState extends State<PlayerPage>{
   String audioasset = "assets/audio/Timal.mp3";
   bool isplaying = false;
   bool isRecording = false;
-
-  late YoutubePlayerController _controller;
 
   RecorderStream _recorder = RecorderStream();
 
@@ -52,6 +50,8 @@ class _PlayerPageState extends State<PlayerPage>{
   late StreamSubscription _audioStream;
 
   AudioPlayer audioPlayer = AudioPlayer();
+
+
 
   @override
   void dispose() {
@@ -123,8 +123,14 @@ class _PlayerPageState extends State<PlayerPage>{
     });
   }
 
+
+
   @override
   Widget build(BuildContext context) {
+    ListSearch? search;
+    YoutubePlayerController? _controller;
+
+
     return WillPopScope(
       onWillPop: () async{
         int result = await audioPlayer.stop();
@@ -139,17 +145,22 @@ class _PlayerPageState extends State<PlayerPage>{
       },
       child: FutureBuilder<List<dynamic>>(
         future: Future.wait([
-          LyricsSongManager().getSearch("${music.artistName} ${music.name}"),
+          LyricsSongManager().getSearch("${music.artistName} ${music.name} lyrics"),
         ]),
         builder: (context, snapshot){
           if(snapshot.hasData){
             search = snapshot.data?[0];
           }
           _controller = YoutubePlayerController(
-            initialVideoId: search.items?.first.id.videoId ?? "",
+            initialVideoId: search?.items?.first.id.videoId ?? "",
             flags: const YoutubePlayerFlags(
               autoPlay: true,
               mute: false,
+              disableDragSeek: true,
+              loop: false,
+              isLive: false,
+              forceHD: false,
+              enableCaption: false,
             ),
           );
           return DefaultTabController(
@@ -322,106 +333,8 @@ class _PlayerPageState extends State<PlayerPage>{
                                       height: 16,
                                     ),
                                     YoutubePlayer(
-                                        controller: _controller,
+                                        controller: _controller!,
                                         showVideoProgressIndicator: false,
-
-                                    ),
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          onPressed: () async {
-                                            int result = await audioPlayer.seek(const Duration(milliseconds: 0));
-                                            if(result == 1){ //seek successful
-                                              currentpos = 0;}
-                                            else {
-                                              print("Seek unsuccessful.");
-                                            }
-                                          },
-                                          icon: const Icon(Icons.skip_previous),
-                                          color: Colors.white,
-                                          iconSize: 80,
-                                        ),
-                                        IconButton(
-                                          onPressed: () async{
-                                            if(isplaying){
-                                              int result = await audioPlayer.pause();
-                                              if(result == 1){
-                                                setState(() {
-                                                  isplaying = false;
-                                                });
-                                              }else{
-                                                print("Error on pause audio.");
-                                              }
-                                            }else{
-                                              int result = await audioPlayer.resume();
-                                              if(result == 1){
-                                                setState(() {
-                                                  isplaying = true;
-                                                });
-                                              }else{
-                                                print("Error on resume audio.");
-                                              }
-                                            }
-                                          },
-                                          icon: Icon(isplaying?Icons.pause:Icons.play_arrow),
-                                          color: Colors.white,
-                                          iconSize: 120,
-                                        ),
-                                        IconButton(
-                                          onPressed: () => "",
-                                          icon: const Icon(Icons.skip_next),
-                                          color: Colors.white,
-                                          iconSize: 80,
-                                        ),
-                                      ],
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                    ),
-                                    Slider(
-                                      activeColor: Colors.white,
-                                      inactiveColor: Colors.white,
-                                      value: double.parse(currentpos.toString()),
-                                      min: 0,
-                                      max: double.parse(maxduration.toString()),
-                                      divisions: maxduration,
-                                      label: currentpostlabel,
-                                      onChanged: (double value) async {
-                                        int seekval = value.round();
-                                        if(seekval != maxduration){
-                                          int result = await audioPlayer.seek(Duration(milliseconds: seekval));
-                                          if(result == 1){ //seek successful
-                                            currentpos = seekval;
-                                          }else{
-                                            print("Seek unsuccessful.");
-                                          }
-                                        }else{
-                                          int result = await audioPlayer.seek(Duration(milliseconds: 0));
-                                          if(result == 1){ //seek successful
-                                            currentpos = 0;
-                                          }else{
-                                            print("Seek unsuccessful.");
-                                          }
-                                        }
-                                      },
-                                    ),
-                                    Row(
-                                      children: [
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          currentpostlabel,
-                                          style: const TextStyle(fontSize: 25),
-                                          textAlign: TextAlign.right,
-                                        ),
-                                        const SizedBox(
-                                          width: 300,
-                                        ),
-                                        Text(
-                                          maxpostlabel,
-                                          style: const TextStyle(fontSize: 25),
-                                          textAlign: TextAlign.left,
-                                        ),
-                                      ],
                                     ),
                                   ],
                                 ),
@@ -431,17 +344,9 @@ class _PlayerPageState extends State<PlayerPage>{
                                     const SizedBox(
                                       height: 16,
                                     ),
-                                    SizedBox(
-                                        width: MediaQuery.of(context).size.width - 50,
-                                        height: 400,
-                                        child: DecoratedBox(
-                                          decoration: BoxDecoration(
-                                            border:  Border.all(
-                                              color: Colors.white,
-                                              width: 5,
-                                            ),
-                                          ),
-                                        )
+                                    YoutubePlayer(
+                                      controller: _controller!,
+                                      showVideoProgressIndicator: false,
                                     ),
                                     Row(
                                       children: [
