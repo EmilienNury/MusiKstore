@@ -4,6 +4,7 @@ import 'package:ptut_2/core/model/Lyrics/message.dart';
 import 'package:ptut_2/core/model/Lyrics/musicxmatch.dart';
 import 'package:ptut_2/core/model/Songs/feed.dart';
 import 'package:ptut_2/core/model/Songs/songs.dart';
+import 'package:ptut_2/core/model/Videos/list_search.dart';
 
 class LyricsSongManager{
   static final LyricsSongManager _instance = LyricsSongManager._internal();
@@ -30,6 +31,16 @@ class LyricsSongManager{
       debugPrint("Error: $e");
     }
     return feed;
+  }
+
+  Future<ListSearch?> getSearch(String search) async{
+    ListSearch? listSearch;
+    try{
+      listSearch = await ApiManager().getSearch(search);
+    }catch(e){
+      debugPrint("Error: $e");
+    }
+    return listSearch;
   }
 
 }
