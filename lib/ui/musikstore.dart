@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ptut_2/ui/components/custom_app_bar.dart';
 import 'package:ptut_2/ui/components/home.dart';
+import 'package:ptut_2/ui/components/search.dart';
 
 class MusiKstoreApp extends StatefulWidget {
   const MusiKstoreApp({Key? key, required this.title}) : super(key: key);
@@ -18,7 +19,7 @@ class _MusiKstoreAppState extends State<MusiKstoreApp> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     HomePage(),
-    Text('Info not implemented yet'),
+    SearchPage(),
     Text('Info not implemented yet'),
   ];
 
