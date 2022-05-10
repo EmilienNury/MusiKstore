@@ -5,7 +5,7 @@ import '../../core/manager/lyrics_songs_manager.dart';
 import '../../core/model/Songs/songs.dart';
 import '../../theme/colors.dart';
 
-Widget SongsVerticalListView(String type, String? searchTerm) {
+Widget SongsVerticalListView(String type, String? searchTerm, String? playlistName, String? categoryName) {
   if (type == "search") {
     if (searchTerm != null) {
       return FutureBuilder(
@@ -29,9 +29,7 @@ Widget SongsVerticalListView(String type, String? searchTerm) {
                 }
                 else {
                   return SongVerticalListViewContainer(
-                      songList[position].artworkUrl100!,
-                      songList[position].name!,
-                      songList[position].artistName!,
+                      songList[position],
                       context);
                 }
               },
@@ -54,10 +52,68 @@ Widget SongsVerticalListView(String type, String? searchTerm) {
       );
     }
 
-  } else if (type == "category") {
-
   } else if (type == "playlist") {
-      //fetch playlists in database
+    return FutureBuilder(
+      future: LyricsSongManager().getMostPopularSong(), //TODO: fetch songs with the playlist
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          var songs = snapshot.data as Songs;
+          var songList = songs.feed.results!;
+          return ListView.separated(
+            padding: const EdgeInsets.fromLTRB(12, 25, 12, 25),
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            separatorBuilder: (context, position) {
+              return const SizedBox(
+                height: 8.0,
+              );
+            },
+            itemBuilder: (context, position) {
+              return SongVerticalListViewContainer(
+                  songList[position],
+                  context);
+            },
+
+            itemCount: songList.length,
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    );
+  } else if (type == "category") {
+    return FutureBuilder(
+      future: LyricsSongManager().getMostPopularSong(), //TODO: fetch songs with the category
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          var songs = snapshot.data as Songs;
+          var songList = songs.feed.results!;
+          return ListView.separated(
+            padding: const EdgeInsets.fromLTRB(12, 25, 12, 25),
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            separatorBuilder: (context, position) {
+              return const SizedBox(
+                height: 8.0,
+              );
+            },
+            itemBuilder: (context, position) {
+              return SongVerticalListViewContainer(
+                songList[position],
+                context);
+            },
+
+            itemCount: songList.length,
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    );
   }
 
   return SizedBox();

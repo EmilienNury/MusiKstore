@@ -1,12 +1,17 @@
 // Custom widget for song cards
 
 import 'package:flutter/material.dart';
+import 'package:ptut_2/core/model/Songs/song.dart';
+import 'package:ptut_2/core/navigation_service.dart';
+import 'package:ptut_2/ui/player.dart';
 
-Widget SongVerticalListViewContainer(String imageUrl, String songName, String artistName, BuildContext context) {
+Widget SongVerticalListViewContainer(Song song, BuildContext context) {
   return Column(
     children: [
       InkWell(
-        onTap: () {},
+        onTap: () async{
+          await Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamed(PlayerPage.route, arguments: PlayerPageArguments(music: song));
+        },
         child: Container(
           child: Row(
             children: [
@@ -15,7 +20,7 @@ Widget SongVerticalListViewContainer(String imageUrl, String songName, String ar
                 child: Container(
                   height: 100.0,
                   width: 100.0,
-                  child: Image.network(imageUrl),
+                  child: Image.network(song.artworkUrl100!),
                 ),
               ),
               SizedBox(width: 12.0,),
@@ -25,7 +30,7 @@ Widget SongVerticalListViewContainer(String imageUrl, String songName, String ar
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      songName,
+                      song.name!,
                       style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.w800
@@ -34,7 +39,7 @@ Widget SongVerticalListViewContainer(String imageUrl, String songName, String ar
                     ),
                     SizedBox(height: 12.0,),
                     Text(
-                      artistName,
+                      song.artistName!,
                       style: TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w300

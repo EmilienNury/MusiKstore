@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
-import '../core/manager/lyrics_songs_manager.dart';
 import '../theme/colors.dart';
+import 'custom_widget/vlist_songs.dart';
+
+class PlaylistCategoryPageArguments{
+  String? playlistName;
+  String? categoryName;
+
+  PlaylistCategoryPageArguments({this.playlistName, this.categoryName});
+}
 
 class PlaylistCategoryPage extends StatefulWidget {
   static const route = "/playlist_category";
@@ -19,10 +26,11 @@ class _PlaylistCategoryPageState extends State<PlaylistCategoryPage> {
       appBar: AppBar(
         backgroundColor: CustomColors.black,
         title: Text(
-          "${widget.playlistName}${widget.categoryName}",
+          "${widget.playlistName ?? widget.categoryName}",
           style: const TextStyle(fontSize: 25),
         ),
       ),
+      body: (widget.playlistName != null)? SongsVerticalListView("playlist", null, widget.playlistName, null) : SongsVerticalListView("category", null, null, widget.categoryName),
     );
   }
 }

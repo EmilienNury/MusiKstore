@@ -7,7 +7,7 @@ import '../../core/model/Songs/songs.dart';
 
 Widget HomeSongs(Songs songs, String category) {
   if(songs.feed.results != null){
-    if(!songs.feed.results!.isEmpty) {
+    if(songs.feed.results!.isNotEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
         child: SizedBox(

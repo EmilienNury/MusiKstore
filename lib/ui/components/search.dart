@@ -95,7 +95,7 @@ class _SearchPageState extends State<SearchPage> {
               iconColor: Colors.white,
               backgroundColor: CustomColors.grey,
               controller: controller,
-              body: FloatingSearchBarScrollNotifier(child: SongsVerticalListView("search", selectedTerm)),
+              body: FloatingSearchBarScrollNotifier(child: SongsVerticalListView("search", selectedTerm, null, null)),
               transition:  CircularFloatingSearchBarTransition(),
               physics: BouncingScrollPhysics(),
               title: Text(

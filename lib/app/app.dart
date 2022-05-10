@@ -3,6 +3,7 @@ import 'package:ptut_2/core/model/Songs/song.dart';
 import 'package:ptut_2/core/navigation_service.dart';
 import 'package:ptut_2/ui/musikstore.dart';
 import 'package:ptut_2/ui/player.dart';
+import 'package:ptut_2/ui/playlist_category.dart';
 
 import '../theme/main_theme.dart';
 
@@ -27,6 +28,16 @@ class MyApp extends StatelessWidget {
             }else{
               throw Exception(
                 "Cette route doit avoir un son"
+              );
+            }
+          case PlaylistCategoryPage.route:
+            if(arguments != null && arguments is PlaylistCategoryPageArguments){
+              String? playlistName = arguments.playlistName;
+              String? categoryName = arguments.categoryName;
+              return MaterialPageRoute(builder: (_) => PlaylistCategoryPage(playlistName: playlistName, categoryName: categoryName,));
+            }else{
+              throw Exception(
+                  "Cette route doit avoir soit un non de playlist soit un nom de catégorie"
               );
             }
           default:

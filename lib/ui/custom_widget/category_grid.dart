@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ptut_2/core/navigation_service.dart';
+import 'package:ptut_2/ui/playlist_category.dart';
 
 import '../../theme/colors.dart';
 
@@ -24,8 +26,8 @@ Widget CategoryGrid() {
         shrinkWrap: true,
         children: [
           InkWell(
-            onTap: () {
-              //TODO : implement navigation
+            onTap: () async{
+              await Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamed(PlaylistCategoryPage.route, arguments: PlaylistCategoryPageArguments(categoryName: "Hip - Hop"));
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
@@ -54,8 +56,8 @@ Widget CategoryGrid() {
             ),
           ),
           InkWell(
-            onTap: () {
-              //TODO : implement navigation
+            onTap: () async{
+              await Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamed(PlaylistCategoryPage.route, arguments: PlaylistCategoryPageArguments(categoryName: "Rap"));
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
@@ -84,8 +86,8 @@ Widget CategoryGrid() {
             ),
           ),
           InkWell(
-            onTap: () {
-              //TODO : implement navigation
+            onTap: () async{
+              await Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamed(PlaylistCategoryPage.route, arguments: PlaylistCategoryPageArguments(categoryName: "Electro"));
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
@@ -114,8 +116,8 @@ Widget CategoryGrid() {
             ),
           ),
           InkWell(
-            onTap: () {
-              //TODO : implement navigation
+            onTap: () async{
+              await Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamed(PlaylistCategoryPage.route, arguments: PlaylistCategoryPageArguments(categoryName: "Country"));
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
@@ -144,8 +146,8 @@ Widget CategoryGrid() {
             ),
           ),
           InkWell(
-            onTap: () {
-              //TODO : implement navigation
+            onTap: () async{
+              await Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamed(PlaylistCategoryPage.route, arguments: PlaylistCategoryPageArguments(categoryName: "Métal"));
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
@@ -174,8 +176,8 @@ Widget CategoryGrid() {
             ),
           ),
           InkWell(
-            onTap: () {
-              //TODO : implement navigation
+            onTap: () async{
+              await Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamed(PlaylistCategoryPage.route, arguments: PlaylistCategoryPageArguments(categoryName: "Pop"));
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
@@ -204,8 +206,8 @@ Widget CategoryGrid() {
             ),
           ),
           InkWell(
-            onTap: () {
-              //TODO : implement navigation
+            onTap: () async{
+              await Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamed(PlaylistCategoryPage.route, arguments: PlaylistCategoryPageArguments(categoryName: "Jazz"));
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
@@ -234,8 +236,8 @@ Widget CategoryGrid() {
             ),
           ),
           InkWell(
-            onTap: () {
-              //TODO : implement navigation
+            onTap: () async{
+              await Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamed(PlaylistCategoryPage.route, arguments: PlaylistCategoryPageArguments(categoryName: "Reggae"));
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
