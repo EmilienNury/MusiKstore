@@ -243,7 +243,7 @@ class _ParametersPageState extends State<ParametersPage>{
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(const Color.fromRGBO(217, 72, 79, 100)),
               ),
-            ) ,
+            ),
           ),
         ],
       ),
