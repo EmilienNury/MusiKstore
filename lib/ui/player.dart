@@ -51,8 +51,6 @@ class _PlayerPageState extends State<PlayerPage>{
 
   AudioPlayer audioPlayer = AudioPlayer();
 
-
-
   @override
   void dispose() {
     _recorderStatus.cancel();
@@ -122,8 +120,6 @@ class _PlayerPageState extends State<PlayerPage>{
       _micChunks.add(data);
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -348,82 +344,11 @@ class _PlayerPageState extends State<PlayerPage>{
                                       controller: _controller!,
                                       showVideoProgressIndicator: false,
                                     ),
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          onPressed: () async {
-                                            int result = await audioPlayer.seek(const Duration(milliseconds: 0));
-                                            if(result == 1){ //seek successful
-                                              currentpos = 0;}
-                                            else {
-                                              print("Seek unsuccessful.");
-                                            }
-                                          },
-                                          icon: const Icon(Icons.skip_previous),
-                                          color: Colors.white,
-                                          iconSize: 80,
-                                        ),
-                                        IconButton(
-                                          icon: Icon(_isRecording?Icons.fiber_manual_record_rounded:Icons.fiber_manual_record_outlined),
-                                          color: Colors.red,
-                                          iconSize: 120,
-                                          onPressed: _isRecording ? _recorder.stop : _recorder.start,
-                                        ),
-                                        IconButton(
-                                          onPressed: () => "",
-                                          icon: const Icon(Icons.skip_next),
-                                          color: Colors.white,
-                                          iconSize: 80,
-                                        ),
-                                      ],
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                    ),
-                                    Slider(
-                                      activeColor: Colors.white,
-                                      inactiveColor: Colors.white,
-                                      value: double.parse(currentpos.toString()),
-                                      min: 0,
-                                      max: double.parse(maxduration.toString()),
-                                      divisions: maxduration,
-                                      label: currentpostlabel,
-                                      onChanged: (double value) async {
-                                        int seekval = value.round();
-                                        if(seekval != maxduration){
-                                          int result = await audioPlayer.seek(Duration(milliseconds: seekval));
-                                          if(result == 1){ //seek successful
-                                            currentpos = seekval;
-                                          }else{
-                                            print("Seek unsuccessful.");
-                                          }
-                                        }else{
-                                          int result = await audioPlayer.seek(Duration(milliseconds: 0));
-                                          if(result == 1){ //seek successful
-                                            currentpos = 0;
-                                          }else{
-                                            print("Seek unsuccessful.");
-                                          }
-                                        }
-                                      },
-                                    ),
-                                    Row(
-                                      children: [
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          currentpostlabel,
-                                          style: const TextStyle(fontSize: 25),
-                                          textAlign: TextAlign.right,
-                                        ),
-                                        const SizedBox(
-                                          width: 300,
-                                        ),
-                                        Text(
-                                          maxpostlabel,
-                                          style: const TextStyle(fontSize: 25),
-                                          textAlign: TextAlign.left,
-                                        ),
-                                      ],
+                                    IconButton(
+                                      icon: Icon(_isRecording?Icons.fiber_manual_record_rounded:Icons.fiber_manual_record_outlined),
+                                      color: Colors.red,
+                                      iconSize: 120,
+                                      onPressed: _isRecording ? _recorder.stop : _recorder.start,
                                     ),
                                   ],
                                 ),
