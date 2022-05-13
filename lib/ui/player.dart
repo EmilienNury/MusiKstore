@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audio_session/audio_session.dart';
@@ -51,7 +50,7 @@ class _PlayerPageState extends State<PlayerPage>{
   bool isplaying = false;
   bool callAPi = false;
 
-  Codec _codec = Codec.aacMP4;
+  Codec _codec = Codec.pcm16WAV;
   String _mPath = 'tau_file.mp4';
   FlutterSoundPlayer? _mPlayer = FlutterSoundPlayer();
   FlutterSoundRecorder? _mRecorder = FlutterSoundRecorder();
@@ -79,7 +78,7 @@ class _PlayerPageState extends State<PlayerPage>{
     Future.delayed(Duration.zero, () async{
       ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
       Uint8List audiobytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
-      int result = await audioPlayer.playBytes(audiobytes);
+      await audioPlayer.playBytes(audiobytes);
       isplaying = true;
       audioPlayer.onDurationChanged.listen((Duration d) { //get the duration of audio
         maxduration = d.inMilliseconds;
@@ -172,7 +171,7 @@ class _PlayerPageState extends State<PlayerPage>{
   void record() {
     _mRecorder!
         .startRecorder(
-      toFile:'/storage/emulated/0/Download/${music.artistName}_${music.name}_Karaoke.mp4',
+      toFile:'/storage/emulated/0/Download/${music.artistName}_${music.name}_Karaoke.wav',
       codec: _codec,
       audioSource: theSource,
     )
