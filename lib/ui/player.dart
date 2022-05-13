@@ -172,7 +172,7 @@ class _PlayerPageState extends State<PlayerPage>{
   void record() {
     _mRecorder!
         .startRecorder(
-      toFile:'/storage/emulated/0/Download/test.mp4',
+      toFile:'/storage/emulated/0/Download/${music.artistName}_${music.name}_Karaoke.mp4',
       codec: _codec,
       audioSource: theSource,
     )
