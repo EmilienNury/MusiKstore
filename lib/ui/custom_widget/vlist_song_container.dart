@@ -261,7 +261,9 @@ class _SongVerticalListViewContainerState extends State<SongVerticalListViewCont
   void save(List<int> selectedIndexes, List<Playlist> playlists) {
     for (var i = 0; i < playlists.length; i++) {
       if (selectedIndexes.contains(i)) {
-        playlists[i].songs.add(widget.song);
+        if (playlists[i].songs.indexWhere((song) => song.id == widget.song.id) == -1) {
+          playlists[i].songs.add(widget.song);
+        }
       } else {
         playlists[i].songs.removeWhere((song) => song.id == widget.song.id);
       }
