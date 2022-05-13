@@ -91,6 +91,19 @@ class _PlayerPageState extends State<PlayerPage>{
           break;
         case "Sans effet":
           audioasset+="Sans_Effet.mp3";
+          break;
+        case "Suavemente":
+          audioasset+="Suavemente.mp3";
+          break;
+        case "Ghir Ntiya (feat. Moha k)":
+          audioasset+="Ghir_Ntiya.mp3";
+          break;
+        case "Ça tourne dans ma tête":
+          audioasset+="tourne.mp3";
+          break;
+        case "VVS":
+          audioasset+="VVS.mp3";
+          break;
       }
       ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
       Uint8List audiobytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
