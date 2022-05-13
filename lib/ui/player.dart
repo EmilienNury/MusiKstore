@@ -46,7 +46,7 @@ class _PlayerPageState extends State<PlayerPage>{
   int currentpos =0;
   String currentpostlabel = "00:00";
   String maxpostlabel = "00:00";
-  String audioasset = "assets/audio/Timal.mp3";
+  String audioasset = "assets/audio/";
   bool isplaying = false;
   bool callAPi = false;
 
@@ -76,6 +76,22 @@ class _PlayerPageState extends State<PlayerPage>{
   void initState(){
     music = widget.music;
     Future.delayed(Duration.zero, () async{
+      switch(music.name){
+        case "CELINE 3X":
+          audioasset+="CELINE.mp3";
+          break;
+        case "Filtré":
+          audioasset+="Timal.mp3";
+          break;
+        case "Si j'savais":
+          audioasset+="Si_jsavais.mp3";
+          break;
+        case "Dégaine (feat. Damso)":
+          audioasset+="Dégaine.mp3";
+          break;
+        case "Sans effet":
+          audioasset+="Sans_Effet.mp3";
+      }
       ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
       Uint8List audiobytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
       await audioPlayer.playBytes(audiobytes);
