@@ -1,15 +1,24 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:audio_session/audio_session.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart'show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:ptut_2/core/manager/lyrics_songs_manager.dart';
 import 'package:ptut_2/core/model/Songs/song.dart';
 import 'package:ptut_2/core/model/Videos/list_search.dart';
 import 'package:ptut_2/theme/colors.dart';
-import 'package:sound_stream/sound_stream.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
+
+typedef _Fn = void Function();
+
+
+const theSource = AudioSource.microphone;
 
 
 class PlayerPageArguments{
@@ -39,24 +48,27 @@ class _PlayerPageState extends State<PlayerPage>{
   String maxpostlabel = "00:00";
   String audioasset = "assets/audio/Timal.mp3";
   bool isplaying = false;
-  bool isRecording = false;
+  bool callAPi = false;
 
-  RecorderStream _recorder = RecorderStream();
-
-  List<Uint8List> _micChunks = [];
-  bool _isRecording = false;
-
-  late StreamSubscription _recorderStatus;
-  late StreamSubscription _audioStream;
+  Codec _codec = Codec.pcm16WAV;
+  String _mPath = 'tau_file.mp4';
+  FlutterSoundPlayer? _mPlayer = FlutterSoundPlayer();
+  FlutterSoundRecorder? _mRecorder = FlutterSoundRecorder();
+  bool _mPlayerIsInited = false;
+  bool _mRecorderIsInited = false;
+  bool _mplaybackReady = false;
 
   AudioPlayer audioPlayer = AudioPlayer();
 
-
+  var files;
 
   @override
   void dispose() {
-    _recorderStatus.cancel();
-    _audioStream.cancel();
+    _mPlayer!.closePlayer();
+    _mPlayer = null;
+
+    _mRecorder!.closeRecorder();
+    _mRecorder = null;
     super.dispose();
   }
 
@@ -66,9 +78,8 @@ class _PlayerPageState extends State<PlayerPage>{
     Future.delayed(Duration.zero, () async{
       ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
       Uint8List audiobytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
-      int result = await audioPlayer.playBytes(audiobytes);
+      await audioPlayer.playBytes(audiobytes);
       isplaying = true;
-
       audioPlayer.onDurationChanged.listen((Duration d) { //get the duration of audio
         maxduration = d.inMilliseconds;
         //generating the duration label
@@ -104,33 +115,124 @@ class _PlayerPageState extends State<PlayerPage>{
         });
       });
     });
-    initPlugin();
+
+    _mPlayer!.openPlayer().then((value) {
+      setState(() {
+        _mPlayerIsInited = true;
+      });
+    });
+
+    openTheRecorder().then((value) {
+      setState(() {
+        _mRecorderIsInited = true;
+      });
+    });
     super.initState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlugin() async {
-    _recorderStatus = _recorder.status.listen((status) {
-      if (mounted) {
-        setState(() {
-          _isRecording = status == SoundStreamStatus.Playing;
-        });
+  Future<void> openTheRecorder() async {
+    if (!kIsWeb) {
+      var status = await Permission.microphone.request();
+      if (status != PermissionStatus.granted) {
+        throw RecordingPermissionException('Microphone permission not granted');
       }
-    });
+    }
+    await _mRecorder!.openRecorder();
+    if (!await _mRecorder!.isEncoderSupported(_codec) && kIsWeb) {
+      _codec = Codec.opusWebM;
+      _mPath = 'tau_file.webm';
+      if (!await _mRecorder!.isEncoderSupported(_codec) && kIsWeb) {
+        _mRecorderIsInited = true;
+        return;
+      }
+    }
+    final session = await AudioSession.instance;
+    await session.configure(AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+      avAudioSessionCategoryOptions:
+      AVAudioSessionCategoryOptions.allowBluetooth |
+      AVAudioSessionCategoryOptions.defaultToSpeaker,
+      avAudioSessionMode: AVAudioSessionMode.spokenAudio,
+      avAudioSessionRouteSharingPolicy:
+      AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      androidAudioAttributes: const AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.speech,
+        flags: AndroidAudioFlags.none,
+        usage: AndroidAudioUsage.voiceCommunication,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      androidWillPauseWhenDucked: true,
+    ));
 
-    _audioStream = _recorder.audioStream.listen((data) {
-      _micChunks.add(data);
+    _mRecorderIsInited = true;
+  }
+
+  void record() {
+    _mRecorder!
+        .startRecorder(
+      toFile:'/storage/emulated/0/Download/${music.artistName}_${music.name}_Karaoke.wav',
+      codec: _codec,
+      audioSource: theSource,
+    )
+        .then((value) {
+      setState(() {});
     });
   }
 
 
+  void stopRecorder() async {
+    await _mRecorder!.stopRecorder().then((value) {
+      setState(() {
+        //var url = value;
+      });
+      setState(() {
+      });
+    });
+  }
 
-  @override
+  void play() {
+    assert(_mPlayerIsInited &&
+        _mplaybackReady &&
+        _mRecorder!.isStopped &&
+        _mPlayer!.isStopped);
+    _mPlayer!
+        .startPlayer(
+        fromURI: _mPath,
+        //codec: kIsWeb ? Codec.opusWebM : Codec.aacADTS,
+        whenFinished: () {
+          setState(() {});
+        })
+        .then((value) {
+      setState(() {});
+    });
+  }
+
+  void stopPlayer() {
+    _mPlayer!.stopPlayer().then((value) {
+      setState(() {});
+    });
+  }
+
+  _Fn? getPlaybackFn() {
+    if (!_mPlayerIsInited || !_mplaybackReady || !_mRecorder!.isStopped) {
+      return null;
+    }
+    return _mPlayer!.isStopped ? play : stopPlayer;
+  }
+
+  _Fn? getRecorderFn() {
+    if (!_mRecorderIsInited) {
+      return null;
+    }
+    return _mRecorder!.isStopped ? record : stopRecorder;
+  }
+
+
+      @override
   Widget build(BuildContext context) {
     ListSearch? search;
     YoutubePlayerController? _controller;
-
-
     return WillPopScope(
       onWillPop: () async{
         int result = await audioPlayer.stop();
@@ -348,82 +450,11 @@ class _PlayerPageState extends State<PlayerPage>{
                                       controller: _controller!,
                                       showVideoProgressIndicator: false,
                                     ),
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          onPressed: () async {
-                                            int result = await audioPlayer.seek(const Duration(milliseconds: 0));
-                                            if(result == 1){ //seek successful
-                                              currentpos = 0;}
-                                            else {
-                                              print("Seek unsuccessful.");
-                                            }
-                                          },
-                                          icon: const Icon(Icons.skip_previous),
-                                          color: Colors.white,
-                                          iconSize: 80,
-                                        ),
-                                        IconButton(
-                                          icon: Icon(_isRecording?Icons.fiber_manual_record_rounded:Icons.fiber_manual_record_outlined),
-                                          color: Colors.red,
-                                          iconSize: 120,
-                                          onPressed: _isRecording ? _recorder.stop : _recorder.start,
-                                        ),
-                                        IconButton(
-                                          onPressed: () => "",
-                                          icon: const Icon(Icons.skip_next),
-                                          color: Colors.white,
-                                          iconSize: 80,
-                                        ),
-                                      ],
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                    ),
-                                    Slider(
-                                      activeColor: Colors.white,
-                                      inactiveColor: Colors.white,
-                                      value: double.parse(currentpos.toString()),
-                                      min: 0,
-                                      max: double.parse(maxduration.toString()),
-                                      divisions: maxduration,
-                                      label: currentpostlabel,
-                                      onChanged: (double value) async {
-                                        int seekval = value.round();
-                                        if(seekval != maxduration){
-                                          int result = await audioPlayer.seek(Duration(milliseconds: seekval));
-                                          if(result == 1){ //seek successful
-                                            currentpos = seekval;
-                                          }else{
-                                            print("Seek unsuccessful.");
-                                          }
-                                        }else{
-                                          int result = await audioPlayer.seek(Duration(milliseconds: 0));
-                                          if(result == 1){ //seek successful
-                                            currentpos = 0;
-                                          }else{
-                                            print("Seek unsuccessful.");
-                                          }
-                                        }
-                                      },
-                                    ),
-                                    Row(
-                                      children: [
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          currentpostlabel,
-                                          style: const TextStyle(fontSize: 25),
-                                          textAlign: TextAlign.right,
-                                        ),
-                                        const SizedBox(
-                                          width: 300,
-                                        ),
-                                        Text(
-                                          maxpostlabel,
-                                          style: const TextStyle(fontSize: 25),
-                                          textAlign: TextAlign.left,
-                                        ),
-                                      ],
+                                    IconButton(
+                                      icon: Icon(_mRecorder!.isRecording?Icons.fiber_manual_record_rounded:Icons.fiber_manual_record_outlined),
+                                      color: Colors.red,
+                                      iconSize: 120,
+                                      onPressed: getRecorderFn(),
                                     ),
                                   ],
                                 ),

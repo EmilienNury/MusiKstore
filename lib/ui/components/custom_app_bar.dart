@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ptut_2/core/navigation_service.dart';
+
+import '../parameters.dart';
 
 class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
   final String title;
@@ -23,7 +26,9 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
       actions: [
         IconButton(
           icon: const Icon(Icons.settings),
-          onPressed: () => a(), //TODO: change fonction to navigate to settings
+          onPressed: () async{
+            await Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamed(ParametersPage.route);
+          },
         )
       ],
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ptut_2/ui/components/add.dart';
 import 'package:ptut_2/ui/components/custom_app_bar.dart';
 import 'package:ptut_2/ui/components/home.dart';
 import 'package:ptut_2/ui/components/search.dart';
@@ -20,7 +21,7 @@ class _MusiKstoreAppState extends State<MusiKstoreApp> {
   static const List<Widget> _widgetOptions = <Widget>[
     HomePage(),
     SearchPage(),
-    Text('Not implemented yet'),
+    AddPage(),
   ];
 
   void _onItemTapped(int index) {

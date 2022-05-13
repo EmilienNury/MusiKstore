@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:ptut_2/core/model/Songs/song.dart';
 import 'package:ptut_2/core/navigation_service.dart';
 import 'package:ptut_2/ui/musikstore.dart';
+import 'package:ptut_2/ui/parameters.dart';
 import 'package:ptut_2/ui/player.dart';
+import 'package:ptut_2/ui/subscribe.dart';
 import 'package:ptut_2/ui/playlist_category.dart';
 
 import '../theme/main_theme.dart';
@@ -21,6 +23,10 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: (RouteSettings settings){
         var arguments = settings.arguments;
         switch(settings.name){
+          case SubscribePage.route:
+            return MaterialPageRoute(builder: (_) => const SubscribePage());
+          case ParametersPage.route:
+            return MaterialPageRoute(builder: (_) => const ParametersPage());
           case PlayerPage.route:
             if(arguments != null && arguments is PlayerPageArguments){
               Song song = arguments.music;
