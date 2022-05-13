@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ptut_2/core/manager/database_manager.dart';
+import 'package:ptut_2/core/model/Playlists/playlist.dart';
 import 'package:ptut_2/ui/custom_widget/category_grid.dart';
 import 'package:ptut_2/ui/custom_widget/vlist_song_container.dart';
 import '../../core/manager/lyrics_songs_manager.dart';
@@ -28,9 +30,7 @@ Widget SongsVerticalListView(String type, String? searchTerm, String? playlistNa
                   return CategoryGrid();
                 }
                 else {
-                  return SongVerticalListViewContainer(
-                      songList[position],
-                      context);
+                  return SongVerticalListViewContainer(song: songList[position],);
                 }
               },
 
@@ -54,11 +54,11 @@ Widget SongsVerticalListView(String type, String? searchTerm, String? playlistNa
 
   } else if (type == "playlist") {
     return FutureBuilder(
-      future: LyricsSongManager().getMostPopularSong(), //TODO: fetch songs with the playlist
+      future: DataBaseManager().getPlaylist(playlistName!),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          var songs = snapshot.data as Songs;
-          var songList = songs.feed.results!;
+          var playlist = snapshot.data as Playlist;
+          var songList = playlist.songs;
           return ListView.separated(
             padding: const EdgeInsets.fromLTRB(12, 25, 12, 25),
             scrollDirection: Axis.vertical,
@@ -69,9 +69,7 @@ Widget SongsVerticalListView(String type, String? searchTerm, String? playlistNa
               );
             },
             itemBuilder: (context, position) {
-              return SongVerticalListViewContainer(
-                  songList[position],
-                  context);
+              return SongVerticalListViewContainer(song: songList[position],);
             },
 
             itemCount: songList.length,
@@ -85,7 +83,7 @@ Widget SongsVerticalListView(String type, String? searchTerm, String? playlistNa
     );
   } else if (type == "category") {
     return FutureBuilder(
-      future: LyricsSongManager().getMostPopularSong(), //TODO: fetch songs with the category
+      future: LyricsSongManager().getMostPopularSong(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           var songs = snapshot.data as Songs;
@@ -100,9 +98,7 @@ Widget SongsVerticalListView(String type, String? searchTerm, String? playlistNa
               );
             },
             itemBuilder: (context, position) {
-              return SongVerticalListViewContainer(
-                songList[position],
-                context);
+              return SongVerticalListViewContainer(song: songList[position],);
             },
 
             itemCount: songList.length,

@@ -43,6 +43,9 @@ dependencies:
   sound_stream: ^0.3.0
   youtube_player_flutter: ^8.0.0
 
+  # Database
+  sembast: ^3.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

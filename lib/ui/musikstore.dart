@@ -20,7 +20,7 @@ class _MusiKstoreAppState extends State<MusiKstoreApp> {
   static const List<Widget> _widgetOptions = <Widget>[
     HomePage(),
     SearchPage(),
-    Text('Info not implemented yet'),
+    Text('Not implemented yet'),
   ];
 
   void _onItemTapped(int index) {
