@@ -9,8 +9,9 @@ import 'package:ptut_2/theme/colors.dart';
 import 'package:ptut_2/ui/player.dart';
 
 class SongVerticalListViewContainer extends StatefulWidget {
-  const SongVerticalListViewContainer({Key? key, required this.song}) : super(key: key);
+  const SongVerticalListViewContainer({Key? key, required this.song, required this.isFav}) : super(key: key);
   final Song song;
+  final bool isFav;
 
   @override
   State<SongVerticalListViewContainer> createState() => _SongVerticalListViewContainerState();
@@ -18,11 +19,13 @@ class SongVerticalListViewContainer extends StatefulWidget {
 
 class _SongVerticalListViewContainerState extends State<SongVerticalListViewContainer> {
   late TextEditingController controller;
+  late bool isFavorite;
 
   @override
   void initState() {
     super.initState();
     controller = TextEditingController();
+    isFavorite = widget.isFav;
   }
 
   @override
@@ -76,13 +79,17 @@ class _SongVerticalListViewContainerState extends State<SongVerticalListViewCont
                     ],
                   ),
                 ),
-                IconButton( icon: Icon(Icons.favorite_border, color: Colors.white,), onPressed: () {
-                  //TODO: implement
+                IconButton( icon: isFavorite ? Icon(Icons.favorite, color: CustomColors.red,) : Icon(Icons.favorite_border, color: Colors.white,), onPressed: () {
+                  if(isFavorite) {
+                    DataBaseManager().removeFavSong(widget.song);
+                  } else {
+                    DataBaseManager().addFavSong(widget.song);
+                  }
+                  setState(() {
+                    isFavorite = !isFavorite;
+                  });
                 }),
                 IconButton( icon: Icon(Icons.playlist_add, color: Colors.white,), onPressed: () {
-                  /*var playlist = Playlist(songs: [], name: 'Détente');
-                  playlist.songs.add(widget.song);
-                  DataBaseManager().addPlaylist(playlist);*/
                   openAddToPlaylistModalBottomSheet();
                 })
               ],

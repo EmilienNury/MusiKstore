@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ptut_2/core/manager/database_manager.dart';
+import 'package:ptut_2/core/model/Songs/songs.dart';
 import 'package:ptut_2/ui/custom_widget/home_songs.dart';
 import 'package:ptut_2/ui/custom_widget/song_container.dart';
 
@@ -19,22 +20,22 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return FutureBuilder<List<dynamic>>(
       future: Future.wait([
-        //DataBaseManager().getAllFavSongs(),
+        DataBaseManager().getAllFavSongs(),
         LyricsSongManager().getMostPopularSong(),
         DataBaseManager().getAllPlaylists(),
       ]),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          //var favSongs = snapshot.data?[0];   // as list<Song>
-          var popularSongs = snapshot.data?[0];
-          var playlists = snapshot.data?[1];
+          var favSongs = snapshot.data?[0];
+          var popularSongs = snapshot.data?[1] as Songs;
+          var playlists = snapshot.data?[2];
           return Container(
             child: ListView(
                 scrollDirection: Axis.vertical,
                 children: <Widget>[
-                  //HomeSongs(favSongs, "Favoris"),
-                  HomeSongs(popularSongs, "Populaires"),
-                  HomeSongs(popularSongs, "Nos recommendations"),
+                  HomeSongs(favSongs, "Favoris"),
+                  HomeSongs(popularSongs.feed.results!, "Populaires"),
+                  HomeSongs(popularSongs.feed.results!, "Nos recommendations"),
                   HomePlaylists(
                     playlists: playlists,
                     onPlaylistChanged: () {

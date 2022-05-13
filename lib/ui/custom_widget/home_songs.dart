@@ -1,13 +1,14 @@
 //Widget that display listview of songs
 
 import 'package:flutter/material.dart';
+import 'package:ptut_2/core/model/Songs/song.dart';
 import 'package:ptut_2/ui/custom_widget/song_container.dart';
 
 import '../../core/model/Songs/songs.dart';
 
-Widget HomeSongs(Songs songs, String category) {
-  if(songs.feed.results != null){
-    if(songs.feed.results!.isNotEmpty) {
+Widget HomeSongs(List<Song> songs, String category) {
+  if(songs != null){
+    if(songs.isNotEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
         child: SizedBox(
@@ -33,9 +34,9 @@ Widget HomeSongs(Songs songs, String category) {
                     );
                   },
                   itemBuilder: (context, position) {
-                    return SongContainer(songs.feed.results![position]);
+                    return SongContainer(songs[position]);
                   },
-                  itemCount: songs.feed.results!.length,
+                  itemCount: songs.length,
                 ),
               )
             ] ,

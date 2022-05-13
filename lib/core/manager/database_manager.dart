@@ -38,15 +38,26 @@ class DataBaseManager {
       return true;
     }
     return false;
-  }
-
-  addFavLaunch(Launch launch) {
-    store.record(launch.id).put(db, launch.toJson());
-  }
-
-  removeFavLaunch(Launch launch) {
-    store.record(launch.id).delete(db);
   }*/
+  Future<List<Song>> getAllFavSongs() async {
+    List<Song> songs = [];
+    var value = await fav_store.find(db);
+    for (var i in value){
+      Map<String, dynamic>? storedFavSongJson = await fav_store.record(i.key).get(db);
+      if (storedFavSongJson != null) {
+        songs.add(Song.fromJson(storedFavSongJson));
+      }
+    }
+    return songs;
+  }
+
+  addFavSong(Song song) {
+    fav_store.record(song.id).put(db, song.toJson());
+  }
+
+  removeFavSong(Song song) {
+    fav_store.record(song.id).delete(db);
+  }
 
   Future<List<Playlist>> getAllPlaylists() async {
     List<Playlist> playlists = [];
