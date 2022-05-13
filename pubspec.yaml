@@ -83,6 +83,10 @@ flutter:
     - assets/audio/Dégaine.mp3
     - assets/audio/Sans_Effet.mp3
     - assets/audio/Si_jsavais.mp3
+    - assets/audio/Suavemente.mp3
+    - assets/audio/Ghir_Ntiya.mp3
+    - assets/audio/tourne.mp3
+    - assets/audio/VVS.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
