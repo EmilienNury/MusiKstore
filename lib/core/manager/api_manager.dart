@@ -55,7 +55,7 @@ class ApiManager{
   Future<ListSearch?> getSearch(String search) async{
     try{
       return await dioVideos.get("search",
-          queryParameters: {"q" : search, "key": "AIzaSyCTwsQ9afZBocxlxCa0uQHrWEl8911tyMs"}
+          queryParameters: {"q" : search, "key": "AIzaSyBP_yoNeH6880N5lX7xTti56cF9dAf4hJ0"}
       ).then((response) => parseSearch(response.data));
     }catch(e){
       print("Error for videos: $e");
