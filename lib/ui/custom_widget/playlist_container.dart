@@ -27,7 +27,7 @@ class _PlaylistContainerState extends State<PlaylistContainer> {
           await Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamed(PlaylistCategoryPage.route, arguments: PlaylistCategoryPageArguments(playlistName: widget.playlistName));
           widget.onPlaylistChanged();
         },
-        onLongPress: (){}/*openDeletePlaylistMenu*/,
+        onLongPress: openDeletePlaylistMenu,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -64,17 +64,27 @@ class _PlaylistContainerState extends State<PlaylistContainer> {
       ),
     );
   }
-  void openDeletePlaylistMenu(LongPressDownDetails details) {
+  void openDeletePlaylistMenu() {
     final RenderObject overlay = Overlay.of(context)!.context.findRenderObject()!;
+    final renderObject = context.findRenderObject();
+    var translation = renderObject?.getTransformTo(null).getTranslation();
+    var i = renderObject?.paintBounds.shift(Offset(translation!.x + 15, translation.y - 60));
 
     showMenu(
         context: context,
+        color: CustomColors.grey,
         position: RelativeRect.fromRect(
-            details.globalPosition & const Size(40, 40), // smaller rect, the touch area
+            i!, // smaller rect, the touch area
             Offset.zero & overlay.semanticBounds.size // Bigger rect, the entire screen
         ),
         items: [PopupMenuItem(
-          child: Text("Supprimer"),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Icon(Icons.delete, color: CustomColors.red,),
+              Text("Supprimer", style: TextStyle(color: CustomColors.red),),
+            ],
+          ),
           onTap: () async {
             var playlistToDelete = await DataBaseManager().getPlaylist(widget.playlistName);
             DataBaseManager().removePlaylist(playlistToDelete as Playlist);

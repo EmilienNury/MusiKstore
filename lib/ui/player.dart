@@ -323,7 +323,6 @@ class _PlayerPageState extends State<PlayerPage>{
                                     ),
                                     SizedBox(
                                       width: MediaQuery.of(context).size.width - 50,
-                                      height: 400,
                                       child: Image.network(
                                         music.artworkUrl100 ?? "",
                                         fit: BoxFit.cover,
@@ -407,22 +406,23 @@ class _PlayerPageState extends State<PlayerPage>{
                                       },
                                     ),
                                     Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        const SizedBox(
-                                          width: 10,
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                          child: Text(
+                                            currentpostlabel,
+                                            style: const TextStyle(fontSize: 25),
+                                            textAlign: TextAlign.right,
+                                          ),
                                         ),
-                                        Text(
-                                          currentpostlabel,
-                                          style: const TextStyle(fontSize: 25),
-                                          textAlign: TextAlign.right,
-                                        ),
-                                        const SizedBox(
-                                          width: 300,
-                                        ),
-                                        Text(
-                                          maxpostlabel,
-                                          style: const TextStyle(fontSize: 25),
-                                          textAlign: TextAlign.left,
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                          child: Text(
+                                            maxpostlabel,
+                                            style: const TextStyle(fontSize: 25),
+                                            textAlign: TextAlign.left,
+                                          ),
                                         ),
                                       ],
                                     ),

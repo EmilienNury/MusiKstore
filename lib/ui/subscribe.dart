@@ -60,9 +60,9 @@ class _SubscribePageState extends State<SubscribePage>{
           SizedBox(
             height: 180,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Container(
-                  padding: const EdgeInsets.fromLTRB(40, 20, 50, 0),
                   child: Column(
                     children: [
                       const Text(
@@ -105,7 +105,6 @@ class _SubscribePageState extends State<SubscribePage>{
                   color: Colors.white,
                 ),
                 Container(
-                  padding: const EdgeInsets.fromLTRB(50, 20, 0, 0),
                   child:  Column(
                     children: [
                       const Text(
